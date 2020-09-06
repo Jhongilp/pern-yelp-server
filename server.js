@@ -1,7 +1,7 @@
 require("dotenv").config();
 // const morgan = require("morgan");
 const express = require("express");
-
+const cors = require("cors")
 const db = require("./db");
 
 const app = express();
@@ -12,12 +12,13 @@ const app = express();
 // });
 // app.use(morgan("dev")); // third party middleware
 
+app.use(cors());
 app.use(express.json()); // middleware that append a body property in the request
 
 app.get("/api/v1/restaurants", async (req, res) => {
   try {
     const results = await db.query("SELECT * FROM restaurants");
-    console.log("results: ", results);
+    // console.log("results: ", results);
     res.json({
       status: "success",
       results: results.rows.length,
@@ -39,7 +40,7 @@ app.get("/api/v1/restaurants/:id", async (req, res) => {
     const results = await db.query("SELECT * FROM restaurants WHERE id = $1", [
       req.params.id,
     ]);
-    console.log(results.rows);
+    // console.log(results.rows);
     res.status(200).json({
       status: "success",
       data: {
@@ -51,7 +52,7 @@ app.get("/api/v1/restaurants/:id", async (req, res) => {
 
 // CREATE
 app.post("/api/v1/restaurants", async (req, res) => {
-  console.log("req: ", req.body);
+  // console.log("req: ", req.body);
 
   try {
     const { name, location, price_range } = req.body;
@@ -59,7 +60,7 @@ app.post("/api/v1/restaurants", async (req, res) => {
       "INSERT INTO restaurants (name, location, price_range) values ($1, $2, $3) returning *",
       [name, location, price_range]
     );
-    console.log("create results: ", results);
+    // console.log("create results: ", results);
     res.status(201).json({
       status: "success",
       data: {
@@ -71,9 +72,6 @@ app.post("/api/v1/restaurants", async (req, res) => {
 
 // UPDATE
 app.put("/api/v1/restaurants/:id", async (req, res) => {
-  console.log("res params: ", req.params.id);
-  console.log("req: ", req.body);
-
   try {
     const { name, location, price_range } = req.body;
     const { id } = req.params;
